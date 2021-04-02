@@ -226,6 +226,21 @@ impl SecretKey {
             }
         }
     }
+
+    #[inline]
+    /// Conditionally negate the secret key if it is high
+    pub fn cond_negate_assign(&mut self) -> Result<(), Error> {
+        unsafe {
+            if ffi::secp256k1_ec_seckey_cond_negate(
+                self.as_mut_c_ptr(),
+                self.as_c_ptr(),
+            ) != 1 {
+                Err(InvalidSecretKey)
+            } else {
+                Ok(())
+            }
+        }
+    }
 }
 
 serde_impl!(SecretKey, constants::SECRET_KEY_SIZE);
@@ -793,6 +808,25 @@ mod test {
             sk.mul_assign(skc.as_ref()).unwrap();
             assert_eq!(sk.as_ref(), super::ONE_KEY.as_ref());
         }
+    }
+
+    #[test]
+    fn test_cond_negate() {
+        let sk_bytes = [0xf1u8; constants::SECRET_KEY_SIZE];
+        let mut sk = SecretKey::from_slice(&sk_bytes).unwrap();
+        let skc = sk.clone();
+
+        sk.cond_negate_assign().unwrap();
+        assert!(sk.as_ref() != skc.as_ref());
+
+        let skneg = sk.clone();
+        sk.cond_negate_assign().unwrap();
+        assert_eq!(sk.as_ref(), skneg.as_ref());
+
+        sk.add_assign(super::ONE_KEY.as_ref()).unwrap();
+        sk.add_assign(skc.as_ref()).unwrap();
+
+        assert_eq!(sk.as_ref(), super::ONE_KEY.as_ref());
     }
 
     #[test]
