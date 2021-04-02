@@ -377,6 +377,11 @@ extern "C" {
                                         tweak: *const c_uchar)
                                         -> c_int;
 
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_4_0_ec_seckey_inverse")]
+    pub fn secp256k1_ec_seckey_inverse(out: *mut c_uchar,
+                                       ins: *const c_uchar)
+                                       -> c_int;
+
     // EC
     #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_4_0_ec_pubkey_create")]
     pub fn secp256k1_ec_pubkey_create(cx: *const Context, pk: *mut PublicKey,
