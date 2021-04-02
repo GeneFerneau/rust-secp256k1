@@ -673,6 +673,19 @@ int rustsecp256k1_v0_4_0_ec_seckey_inverse(unsigned char *r, const unsigned char
     return ret;
 }
 
+int rustsecp256k1_v0_4_0_ec_seckey_cond_negate(unsigned char *r, const unsigned char *a) {
+    int high, ret = 0;
+    rustsecp256k1_v0_4_0_scalar sec;
+    VERIFY_CHECK(r != NULL);
+    VERIFY_CHECK(a != NULL);
+
+    ret = rustsecp256k1_v0_4_0_scalar_set_b32_seckey(&sec, a);
+    high = rustsecp256k1_v0_4_0_scalar_is_high(&sec);
+    rustsecp256k1_v0_4_0_scalar_cond_negate(&sec, high);
+    rustsecp256k1_v0_4_0_scalar_get_b32(r, &sec);
+    return ret;
+}
+
 int rustsecp256k1_v0_4_0_ec_pubkey_tweak_mul(const rustsecp256k1_v0_4_0_context* ctx, rustsecp256k1_v0_4_0_pubkey *pubkey, const unsigned char *tweak32) {
     rustsecp256k1_v0_4_0_ge p;
     rustsecp256k1_v0_4_0_scalar factor;
