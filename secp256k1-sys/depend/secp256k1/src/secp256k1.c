@@ -729,6 +729,15 @@ int rustsecp256k1_v0_4_0_ec_pubkey_combine(const rustsecp256k1_v0_4_0_context* c
     return 1;
 }
 
+void rustsecp256k1_v0_4_0_ec_pubkey_f(const rustsecp256k1_v0_4_0_context* ctx, unsigned char *x, const rustsecp256k1_v0_4_0_pubkey *pk) {
+    rustsecp256k1_v0_4_0_ge r;
+
+    rustsecp256k1_v0_4_0_pubkey_load(ctx, &r, pk);
+    rustsecp256k1_v0_4_0_fe_normalize(&r.x);
+    rustsecp256k1_v0_4_0_fe_normalize(&r.y);
+    rustsecp256k1_v0_4_0_fe_get_b32(x, &r.x);
+}
+
 #ifdef ENABLE_MODULE_ECDH
 # include "modules/ecdh/main_impl.h"
 #endif

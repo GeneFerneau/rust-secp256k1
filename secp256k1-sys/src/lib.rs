@@ -412,6 +412,11 @@ extern "C" {
                                        n: c_int)
                                        -> c_int;
 
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_4_0_ec_pubkey_f")]
+    pub fn secp256k1_ec_pubkey_f(cx: *const Context,
+                                 x: *mut c_uchar,
+                                 pk: *const PublicKey);
+
     #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_4_0_ecdh")]
     pub fn secp256k1_ecdh(
         cx: *const Context,
