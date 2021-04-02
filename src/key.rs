@@ -211,6 +211,21 @@ impl SecretKey {
             }
         }
     }
+
+    #[inline]
+    /// Calculates the modular inverse of the secret key
+    pub fn inverse_assign(&mut self) -> Result<(), Error> {
+        unsafe {
+            if ffi::secp256k1_ec_seckey_inverse(
+                self.as_mut_c_ptr(),
+                self.as_c_ptr(),
+            ) != 1 {
+                Err(InvalidSecretKey)
+            } else {
+                Ok(())
+            }
+        }
+    }
 }
 
 serde_impl!(SecretKey, constants::SECRET_KEY_SIZE);
@@ -748,6 +763,22 @@ mod test {
         assert_eq!(original_sk, sk);
         assert_eq!(original_pk, pk);
         assert_eq!(PublicKey::from_secret_key(&s, &sk), pk);
+    }
+
+    #[test]
+    fn test_inverse() {
+        let s = Secp256k1::new();
+
+        let mut rng = thread_rng();
+        const COUNT: usize = 1024;
+        for _ in 0..COUNT {
+            let (mut sk, _) = s.generate_keypair(&mut rng);
+            let skc = sk.clone();
+            // inverse multiplied by itself should be one
+            sk.inverse_assign().unwrap();
+            sk.mul_assign(skc.as_ref()).unwrap();
+            assert_eq!(sk.as_ref(), super::ONE_KEY.as_ref());
+        }
     }
 
     #[test]
