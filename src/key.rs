@@ -395,6 +395,20 @@ impl PublicKey {
             }
         }
     }
+
+    #[inline]
+    /// Extract the normalized affine x-coordinate from the PublicKey
+    pub fn f(&self) -> [u8; constants::SECRET_KEY_SIZE] {
+        let mut ret = [0u8; constants::SECRET_KEY_SIZE];
+        unsafe {
+            ffi::secp256k1_ec_pubkey_f(
+                ffi::secp256k1_context_no_precomp,
+                ret.as_mut_c_ptr(),
+                self.as_ptr(),
+            );
+        }
+        ret
+    }
 }
 
 impl CPtr for PublicKey {
