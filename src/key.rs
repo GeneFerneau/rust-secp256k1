@@ -365,6 +365,19 @@ impl PublicKey {
     }
 
     #[inline]
+    /// Conditionally negates the pk to the pk `self` in place, if the pk is negative
+    /// Will return an error if the pk would be invalid.
+    pub fn cond_negate_assign<C: Verification>(
+        &mut self,
+        secp: &Secp256k1<C>
+    ) {
+        unsafe {
+            let res = ffi::secp256k1_ec_pubkey_cond_negate(secp.ctx, &mut self.0);
+            debug_assert_eq!(res, 1);
+        }
+    }
+
+    #[inline]
     /// Adds the pk corresponding to `other` to the pk `self` in place
     /// Will return an error if the resulting key would be invalid or
     /// if the tweak was not a 32-byte length slice.
@@ -843,6 +856,22 @@ mod test {
         sk.add_assign(skc.as_ref()).unwrap();
 
         assert_eq!(sk.as_ref(), super::ONE_KEY.as_ref());
+    }
+
+    #[test]
+    fn pubkey_cond_negate() {
+        let s = Secp256k1::new();
+        let sk_bytes = [0xf1u8; constants::SECRET_KEY_SIZE];
+        let sk = SecretKey::from_slice(&sk_bytes).unwrap();
+        let mut pk = PublicKey::from_secret_key(&s, &sk);
+
+        let pkc = pk.clone();
+        pk.cond_negate_assign(&s);
+        assert!(!(pk == pkc));
+
+        let pkp = pk.clone();
+        pk.cond_negate_assign(&s);
+        assert_eq!(pk, pkp);
     }
 
     #[test]
