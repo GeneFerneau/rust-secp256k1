@@ -402,6 +402,9 @@ extern "C" {
     pub fn secp256k1_ec_pubkey_negate(cx: *const Context,
                                       pk: *mut PublicKey) -> c_int;
 
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_4_0_ec_pubkey_cond_negate")]
+    pub fn secp256k1_ec_pubkey_cond_negate(cx: *const Context,
+                                           pk: *mut PublicKey) -> c_int;
 
     #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_4_0_ec_pubkey_tweak_add")]
     pub fn secp256k1_ec_pubkey_tweak_add(cx: *const Context,

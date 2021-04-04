@@ -69,6 +69,10 @@ static int rustsecp256k1_v0_4_0_fe_equal(const rustsecp256k1_v0_4_0_fe *a, const
 /** Same as rustsecp256k1_v0_4_0_fe_equal, but may be variable time. */
 static int rustsecp256k1_v0_4_0_fe_equal_var(const rustsecp256k1_v0_4_0_fe *a, const rustsecp256k1_v0_4_0_fe *b);
 
+/** Compare two field elements in constant time. Requires both inputs to be normalized
+ *  algorithm from https://github.com/chmike/cst_time_memcmp */
+static int rustsecp256k1_v0_4_0_fe_cmp(const rustsecp256k1_v0_4_0_fe *a, const rustsecp256k1_v0_4_0_fe *b);
+
 /** Compare two field elements. Requires both inputs to be normalized */
 static int rustsecp256k1_v0_4_0_fe_cmp_var(const rustsecp256k1_v0_4_0_fe *a, const rustsecp256k1_v0_4_0_fe *b);
 

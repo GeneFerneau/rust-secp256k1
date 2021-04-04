@@ -300,6 +300,21 @@ SECP256K1_INLINE static void rustsecp256k1_v0_4_0_fe_clear(rustsecp256k1_v0_4_0_
     }
 }
 
+static int rustsecp256k1_v0_4_0_fe_cmp(const rustsecp256k1_v0_4_0_fe *a, const rustsecp256k1_v0_4_0_fe *b) {
+    int res = 0, i, diff;
+#ifdef VERIFY
+    VERIFY_CHECK(a->normalized);
+    VERIFY_CHECK(b->normalized);
+    rustsecp256k1_v0_4_0_fe_verify(a);
+    rustsecp256k1_v0_4_0_fe_verify(b);
+#endif
+    for (i = 9; i >= 0; i--) {
+        diff = a->n[i] - b->n[i];
+	res = (res & (((diff - 1) & ~diff) >> 8)) | diff;
+    }
+    return (res > 0) - (res < 0);
+}
+
 static int rustsecp256k1_v0_4_0_fe_cmp_var(const rustsecp256k1_v0_4_0_fe *a, const rustsecp256k1_v0_4_0_fe *b) {
     int i;
 #ifdef VERIFY

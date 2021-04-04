@@ -762,6 +762,30 @@ void rustsecp256k1_v0_4_0_ec_pubkey_f(const rustsecp256k1_v0_4_0_context* ctx, u
     rustsecp256k1_v0_4_0_fe_get_b32(x, &r.x);
 }
 
+int rustsecp256k1_v0_4_0_ec_pubkey_cond_negate(const rustsecp256k1_v0_4_0_context* ctx, rustsecp256k1_v0_4_0_pubkey* pubkey) {
+    int ret = 0, is_neg = 0;
+    rustsecp256k1_v0_4_0_ge p;
+    rustsecp256k1_v0_4_0_fe zero;
+
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(pubkey != NULL);
+
+    rustsecp256k1_v0_4_0_fe_clear(&zero);
+    rustsecp256k1_v0_4_0_fe_normalize_weak(&zero);
+
+    ret = rustsecp256k1_v0_4_0_pubkey_load(ctx, &p, pubkey);
+    if (ret) {
+        rustsecp256k1_v0_4_0_fe_normalize_weak(&p.y);
+        is_neg = rustsecp256k1_v0_4_0_fe_cmp(&p.y, &zero);
+
+        if (is_neg == -1) {
+            rustsecp256k1_v0_4_0_ge_neg(&p, &p);
+            rustsecp256k1_v0_4_0_pubkey_save(pubkey, &p);
+        }
+    }
+    return ret;
+}
+
 #ifdef ENABLE_MODULE_ECDH
 # include "modules/ecdh/main_impl.h"
 #endif
