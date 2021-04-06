@@ -241,6 +241,22 @@ impl SecretKey {
             }
         }
     }
+
+    #[inline]
+    /// Check if the SecretKey is high (i.e. negative)
+    pub fn is_high(&self) -> Result<bool, Error> {
+        let mut ret = 0i32;
+        unsafe {
+            if ffi::secp256k1_ec_seckey_is_high(
+                &mut ret,
+                self.as_c_ptr(),
+            ) != 1 {
+                Err(InvalidSecretKey)
+            } else {
+                Ok(ret == 1)
+            }
+        }
+    }
 }
 
 serde_impl!(SecretKey, constants::SECRET_KEY_SIZE);
